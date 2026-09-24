@@ -1,0 +1,10 @@
+---
+source: crates/biome_js_analyze/tests/spec_tests.rs
+expression: overloadReexports.ts
+---
+# Input
+```ts
+export { deprecatedLast as renamed, allDeprecated as obsolete } from "./overloads";
+export * from "./overloads";
+
+```

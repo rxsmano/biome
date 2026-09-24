@@ -589,14 +589,10 @@ impl SemanticEventExtractor {
                         };
                         self.push_binding(hoisted_scope_id, BindingName::Value(name), info);
                     }
-                    AnyJsBindingDeclaration::TsDeclareFunctionDeclaration(_) => {
-                        declaration_kind = JsDeclarationKind::Function;
-                        hoisted_scope_id = self.scope_index_to_hoist_declarations(1);
-                        self.push_binding(hoisted_scope_id, BindingName::Value(name), info);
-                    }
-                    AnyJsBindingDeclaration::TsDeclareFunctionExportDefaultDeclaration(_)
+                    AnyJsBindingDeclaration::TsDeclareFunctionDeclaration(_)
+                    | AnyJsBindingDeclaration::TsDeclareFunctionExportDefaultDeclaration(_)
                     | AnyJsBindingDeclaration::JsFunctionExportDefaultDeclaration(_) => {
-                        declaration_kind = JsDeclarationKind::HoistedValue;
+                        declaration_kind = JsDeclarationKind::Function;
                         hoisted_scope_id = self.scope_index_to_hoist_declarations(1);
                         self.push_binding(hoisted_scope_id, BindingName::Value(name), info);
                     }

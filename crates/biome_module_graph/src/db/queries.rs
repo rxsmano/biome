@@ -13,8 +13,11 @@ mod js_scc;
 mod type_inference;
 
 use crate::{JsExport, JsExportedSymbolLookup, JsOwnExport, ModuleDb, ModuleInfo, ModuleInfoKind};
+use biome_js_semantic::{JsDeclarationKind, SemanticModel};
+use biome_js_syntax::binding_ext::AnyJsBindingDeclaration;
 use biome_js_type_info::ImportSymbol;
 use biome_jsdoc_comment::JsdocComment;
+use biome_rowan::TextRange;
 
 pub use crate::db::type_inference::InferredModuleTypes;
 pub use css::*;
@@ -97,12 +100,13 @@ pub fn find_js_exported_symbol<'db>(
     }
 }
 
-/// Finds JSDoc for an exported symbol by `name`, following re-exports through the db.
+/// Finds JSDoc for an exported symbol and its public overload signatures,
+/// following re-exports through the db.
 #[salsa::tracked(returns(ref))]
 pub fn find_jsdoc_for_exported_symbol<'db>(
     db: &'db dyn ModuleDb,
     symbol: SymbolFromModuleInfo<'db>,
-) -> Option<JsdocComment> {
+) -> Option<JsExportedSymbolJsdoc> {
     let mut seen_paths = std::collections::BTreeSet::new();
     let mut stack = vec![symbol];
 
@@ -113,14 +117,17 @@ pub fn find_jsdoc_for_exported_symbol<'db>(
         match &module.exports.get(symbol.name(db).as_str()) {
             Some(JsExport::Own(own_export) | JsExport::OwnType(own_export)) => {
                 return match own_export {
-                    JsOwnExport::Binding(binding_range) => module
-                        .semantic_model
-                        .as_binding_by_range(*binding_range)
-                        .and_then(|binding| binding.jsdoc().cloned()),
+                    JsOwnExport::Binding(binding_range) => {
+                        jsdoc_for_binding(&module.semantic_model, *binding_range)
+                    }
                     JsOwnExport::Type(_) => None,
                     JsOwnExport::Namespace(reexport) => reexport
                         .export_range
-                        .and_then(|range| module.semantic_model.export_jsdoc(range).cloned()),
+                        .and_then(|range| module.semantic_model.export_jsdoc(range).cloned())
+                        .map(|declaration| JsExportedSymbolJsdoc {
+                            declaration: Some(declaration),
+                            overloads: Box::default(),
+                        }),
                 };
             }
             Some(JsExport::Reexport(reexport) | JsExport::ReexportType(reexport)) => {
@@ -170,7 +177,53 @@ pub fn find_jsdoc_for_exported_symbol<'db>(
 
 // #region QUERY HELPER FUNCTIONS
 
+fn jsdoc_for_binding(model: &SemanticModel, range: TextRange) -> Option<JsExportedSymbolJsdoc> {
+    let binding = model.as_binding_by_range(range)?;
+    let mut result = JsExportedSymbolJsdoc {
+        declaration: binding.jsdoc().cloned(),
+        overloads: Box::default(),
+    };
+    if binding.declaration_kind() != JsDeclarationKind::Function {
+        return Some(result);
+    }
+
+    let scope = model
+        .scope_hoisted_to(&binding.syntax())
+        .unwrap_or_else(|| binding.scope());
+    let overloads = scope.overload_sets().into_iter().find(|set| {
+        set.last()
+            .and_then(|id| model.binding_by_id(*id))
+            .is_some_and(|last| last == binding)
+    });
+    let mut comments = Vec::new();
+    for id in overloads.into_iter().flatten() {
+        let overload = model.binding_by_id(id)?;
+        if matches!(
+            overload.tree().declaration(),
+            Some(
+                AnyJsBindingDeclaration::TsDeclareFunctionDeclaration(_)
+                    | AnyJsBindingDeclaration::TsDeclareFunctionExportDefaultDeclaration(_)
+            )
+        ) {
+            comments.push(overload.jsdoc().cloned());
+        }
+    }
+    result.overloads = comments.into_boxed_slice();
+    Some(result)
+}
+
 // #endregion
+
+/// Documentation of an exported declaration and its overload signatures.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct JsExportedSymbolJsdoc {
+    /// JSDoc of the declaration selected by name resolution.
+    pub declaration: Option<JsdocComment>,
+
+    /// Public overload signatures in source order, excluding the implementation.
+    /// Empty for symbols without overloads; undocumented signatures remain `None`.
+    pub overloads: Box<[Option<JsdocComment>]>,
+}
 
 // #region INTERNED TYPES
 

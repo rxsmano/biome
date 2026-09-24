@@ -1,0 +1,125 @@
+---
+source: crates/biome_js_analyze/tests/spec_tests.rs
+expression: invalidOverloads.ts
+---
+# Input
+```ts
+/* should generate diagnostics */
+import { allDeprecated, noMessage } from "./overloads";
+import { obsolete, allDeprecated as reexported } from "./overloadReexports";
+import { allDeprecated as implemented } from "./implementedOverloads";
+import allDeprecatedDefault from "./implementedOverloads";
+
+```
+
+# Diagnostics
+```
+invalidOverloads.ts:2:10 lint/suspicious/noDeprecatedImports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Deprecated import: Use another function.
+  
+    1 │ /* should generate diagnostics */
+  > 2 │ import { allDeprecated, noMessage } from "./overloads";
+      │          ^^^^^^^^^^^^^
+    3 │ import { obsolete, allDeprecated as reexported } from "./overloadReexports";
+    4 │ import { allDeprecated as implemented } from "./implementedOverloads";
+  
+  i An @deprecated annotation indicates the author doesn't want you to rely on this import anymore.
+  
+  i You should probably import a different symbol instead.
+  
+
+```
+
+```
+invalidOverloads.ts:2:25 lint/suspicious/noDeprecatedImports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Deprecated import.
+  
+    1 │ /* should generate diagnostics */
+  > 2 │ import { allDeprecated, noMessage } from "./overloads";
+      │                         ^^^^^^^^^
+    3 │ import { obsolete, allDeprecated as reexported } from "./overloadReexports";
+    4 │ import { allDeprecated as implemented } from "./implementedOverloads";
+  
+  i An @deprecated annotation indicates the author doesn't want you to rely on this import anymore.
+  
+  i You should probably import a different symbol instead.
+  
+
+```
+
+```
+invalidOverloads.ts:3:10 lint/suspicious/noDeprecatedImports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Deprecated import: Use another function.
+  
+    1 │ /* should generate diagnostics */
+    2 │ import { allDeprecated, noMessage } from "./overloads";
+  > 3 │ import { obsolete, allDeprecated as reexported } from "./overloadReexports";
+      │          ^^^^^^^^
+    4 │ import { allDeprecated as implemented } from "./implementedOverloads";
+    5 │ import allDeprecatedDefault from "./implementedOverloads";
+  
+  i An @deprecated annotation indicates the author doesn't want you to rely on this import anymore.
+  
+  i You should probably import a different symbol instead.
+  
+
+```
+
+```
+invalidOverloads.ts:3:20 lint/suspicious/noDeprecatedImports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Deprecated import: Use another function.
+  
+    1 │ /* should generate diagnostics */
+    2 │ import { allDeprecated, noMessage } from "./overloads";
+  > 3 │ import { obsolete, allDeprecated as reexported } from "./overloadReexports";
+      │                    ^^^^^^^^^^^^^
+    4 │ import { allDeprecated as implemented } from "./implementedOverloads";
+    5 │ import allDeprecatedDefault from "./implementedOverloads";
+  
+  i An @deprecated annotation indicates the author doesn't want you to rely on this import anymore.
+  
+  i You should probably import a different symbol instead.
+  
+
+```
+
+```
+invalidOverloads.ts:4:10 lint/suspicious/noDeprecatedImports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Deprecated import: Use another function.
+  
+    2 │ import { allDeprecated, noMessage } from "./overloads";
+    3 │ import { obsolete, allDeprecated as reexported } from "./overloadReexports";
+  > 4 │ import { allDeprecated as implemented } from "./implementedOverloads";
+      │          ^^^^^^^^^^^^^
+    5 │ import allDeprecatedDefault from "./implementedOverloads";
+    6 │ 
+  
+  i An @deprecated annotation indicates the author doesn't want you to rely on this import anymore.
+  
+  i You should probably import a different symbol instead.
+  
+
+```
+
+```
+invalidOverloads.ts:5:8 lint/suspicious/noDeprecatedImports ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Deprecated import: Use another function.
+  
+    3 │ import { obsolete, allDeprecated as reexported } from "./overloadReexports";
+    4 │ import { allDeprecated as implemented } from "./implementedOverloads";
+  > 5 │ import allDeprecatedDefault from "./implementedOverloads";
+      │        ^^^^^^^^^^^^^^^^^^^^
+    6 │ 
+  
+  i An @deprecated annotation indicates the author doesn't want you to rely on this import anymore.
+  
+  i You should probably import a different symbol instead.
+  
+
+```

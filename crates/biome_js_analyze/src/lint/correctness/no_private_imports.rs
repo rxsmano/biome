@@ -295,6 +295,7 @@ fn get_restricted_import_visibility(
         SymbolFromModuleInfo::new(options.module_db, import_name.text(), options.target_info),
     )
     .as_ref()
+    .and_then(|jsdoc| jsdoc.declaration.as_ref())
     .and_then(parse_visibility)
     .unwrap_or(options.default_visibility);
 

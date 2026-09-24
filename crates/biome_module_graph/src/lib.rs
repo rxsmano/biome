@@ -27,11 +27,11 @@ pub use css_module_info::{
 };
 pub use db::queries::{
     BindingTypeInput, CallArgumentTypeInput, CallExpressionTypeInput, ExpressionTypeInput,
-    InferredModuleTypes, JsModuleSccs, LocalTypeInput, NormalizeTypeInput, SymbolFromModuleInfo,
-    build_import_tree_for_html, build_import_tree_for_js, css_classes_for_module,
-    css_property_definitions, find_css_class_definition, find_js_exported_symbol,
-    find_jsdoc_for_exported_symbol, find_member_type, find_value_member_type,
-    function_returns_promise, infer_binding_type, infer_call_argument_type,
+    InferredModuleTypes, JsExportedSymbolJsdoc, JsModuleSccs, LocalTypeInput, NormalizeTypeInput,
+    SymbolFromModuleInfo, build_import_tree_for_html, build_import_tree_for_js,
+    css_classes_for_module, css_property_definitions, find_css_class_definition,
+    find_js_exported_symbol, find_jsdoc_for_exported_symbol, find_member_type,
+    find_value_member_type, function_returns_promise, infer_binding_type, infer_call_argument_type,
     infer_call_expression_type, infer_constructor_argument_type, infer_export_type,
     infer_expression_function_returns_promise, infer_expression_is_array_of_promises,
     infer_expression_is_promise, infer_expression_type, infer_local_type, infer_module_types,

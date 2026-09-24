@@ -1,0 +1,23 @@
+export function mixed(value: string): string;
+/** @deprecated Pass a string. */
+export function mixed(value: number): string;
+/** @deprecated Pass a string. */
+export function mixed(value: string | number): string {
+	return String(value);
+}
+
+/** @deprecated Use another function. */
+export function allDeprecated(value: string): string;
+/** @deprecated Use another function. */
+export function allDeprecated(value: number): string;
+export function allDeprecated(value: string | number): string {
+	return String(value);
+}
+
+/** @deprecated Use another function. */
+export default function allDeprecatedDefault(value: string): string;
+/** @deprecated Use another function. */
+export default function allDeprecatedDefault(value: number): string;
+export default function allDeprecatedDefault(value: string | number): string {
+	return String(value);
+}
